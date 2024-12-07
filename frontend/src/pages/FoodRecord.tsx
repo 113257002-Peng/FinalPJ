@@ -8,9 +8,9 @@ type FoodEntry = {
 };
 
 export default function FoodRecordPage() {
-  const [meal, setMeal] = useState<string>("Dinner");
-  const [time, setTime] = useState<string>("");
-  const [date, setDate] = useState<string>("");
+  const [mealType, setMealType] = useState<string>("Dinner");
+  const [currentTime, setCurrentTime] = useState<string>("");
+  const [currentDate, setCurrentDate] = useState<string>("");
   const [foodEntries, setFoodEntries] = useState<FoodEntry[]>([
     { name: "", weight: "", calories: "" },
   ]);
@@ -30,14 +30,16 @@ export default function FoodRecordPage() {
       day: "2-digit",
     });
 
-    setTime(formattedTime);
-    setDate(formattedDate);
+    setCurrentTime(formattedTime);
+    setCurrentDate(formattedDate);
   }, []);
 
+  // 新增食物條目
   const handleAddEntry = () => {
     setFoodEntries((prev) => [...prev, { name: "", weight: "", calories: "" }]);
   };
 
+  // 更新條目內容
   const handleInputChange = (
     index: number,
     field: keyof FoodEntry,
@@ -50,10 +52,12 @@ export default function FoodRecordPage() {
     );
   };
 
+  // 刪除指定條目
   const handleDeleteEntry = (index: number) => {
     setFoodEntries((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // 生成飲食建議
   const handleGenerateRecommendation = async () => {
     try {
       const response = await fetch("/api/generate-recommendation", {
@@ -61,7 +65,7 @@ export default function FoodRecordPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ meal, foodEntries }),
+        body: JSON.stringify({ mealType, foodEntries }),
       });
 
       if (!response.ok) {
@@ -76,14 +80,13 @@ export default function FoodRecordPage() {
     }
   };
 
+  // 提交結果
   const handleSubmitResults = () => {
-    // 檢查是否有輸入資料
     if (foodEntries.some((entry) => !entry.name.trim())) {
       alert("請確認所有食物條目已填寫名稱！");
       return;
     }
 
-    // 處理提交邏輯
     alert("紀錄成功！");
   };
 
@@ -91,10 +94,11 @@ export default function FoodRecordPage() {
     <DefaultLayout>
       <div className="p-4 max-w-md mx-auto">
         <h1 className="text-2xl font-bold mb-4">What did you eat?</h1>
+        {/* 餐類型與時間顯示 */}
         <div className="flex items-center gap-4 mb-6">
           <select
-            value={meal}
-            onChange={(e) => setMeal(e.target.value)}
+            value={mealType}
+            onChange={(e) => setMealType(e.target.value)}
             className="bg-gray-200 text-gray-600 py-2 px-4 rounded"
           >
             <option value="Breakfast">早餐</option>
@@ -102,11 +106,11 @@ export default function FoodRecordPage() {
             <option value="Dinner">晚餐</option>
             <option value="Other">其他</option>
           </select>
-          <span className="text-gray-600">{time}</span>
-          <span className="text-gray-600 ml-auto">{date}</span>
+          <span className="text-gray-600">{currentTime}</span>
+          <span className="text-gray-600 ml-auto">{currentDate}</span>
         </div>
 
-        {/* 食物紀錄框 */}
+        {/* 食物紀錄區域 */}
         <div className="border p-4 rounded-lg shadow h-64 flex flex-col justify-between">
           <div className="overflow-y-auto flex-grow space-y-4">
             {foodEntries.map((entry, index) => (
@@ -119,7 +123,7 @@ export default function FoodRecordPage() {
                 >
                   ✕
                 </button>
-                {/* 食物內容輸入框 */}
+                {/* 食物名稱輸入框 */}
                 <input
                   type="text"
                   placeholder="食物名稱"
@@ -162,7 +166,7 @@ export default function FoodRecordPage() {
           </button>
         </div>
 
-        {/* 飲食建議按鈕 */}
+        {/* 生成建議按鈕 */}
         <button
           onClick={handleGenerateRecommendation}
           className="w-full bg-green-500 text-white py-2 rounded-lg mt-4 hover:bg-green-600"
@@ -170,7 +174,7 @@ export default function FoodRecordPage() {
           生成飲食建議
         </button>
 
-        {/* 顯示飲食建議 */}
+        {/* 顯示建議區域 */}
         <h2 className="text-xl font-bold mt-6">飲食建議</h2>
         <div className="border p-4 rounded-lg bg-gray-100 mt-2">
           {recommendation || "目前無建議"}

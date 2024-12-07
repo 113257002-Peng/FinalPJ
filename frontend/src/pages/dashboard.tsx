@@ -7,15 +7,11 @@ type CalorieData = {
   totalCalories: number;
 };
 
-type MealData = {
-  meal: string;
-  calories: number;
-};
-
 export default function DashboardPage() {
   const [selectedDay, setSelectedDay] = useState("Sun.");
   const [currentWeek, setCurrentWeek] = useState(0);
 
+  // Weekly calorie data
   const weeklyCalories: CalorieData[][] = [
     [
       { day: "Sun.", totalCalories: 1500 },
@@ -39,12 +35,6 @@ export default function DashboardPage() {
 
   const calorieData = weeklyCalories[currentWeek];
   const BMR = 2000;
-
-  const meals: MealData[] = [
-    { meal: "Breakfast", calories: 350 },
-    { meal: "Lunch", calories: 850 },
-    { meal: "Dinner", calories: 750 },
-  ];
 
   useEffect(() => {
     if (Chart.getChart("calories")) {
@@ -95,7 +85,7 @@ export default function DashboardPage() {
               max: maxCalories + 200,
             },
           },
-          onClick: (event: ChartEvent, elements: ActiveElement[]) => {
+          onClick: (_: ChartEvent, elements: ActiveElement[]) => {
             if (elements.length > 0) {
               const index = elements[0].index as number;
               setSelectedDay(calorieData[index].day);
@@ -106,5 +96,57 @@ export default function DashboardPage() {
     }
   }, [currentWeek, calorieData]);
 
-  return <DefaultLayout>{/* Your JSX Code */}</DefaultLayout>;
+  const handlePreviousWeek = () => {
+    setCurrentWeek((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleNextWeek = () => {
+    setCurrentWeek((prev) => Math.min(prev + 1, weeklyCalories.length - 1));
+  };
+
+  return (
+    <DefaultLayout>
+      <div className="p-4 max-w-2xl mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Weekly Calorie Dashboard</h1>
+
+        {/* Week Navigation */}
+        <div className="flex items-center justify-between mb-4">
+          <button
+            onClick={handlePreviousWeek}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+          >
+            Previous Week
+          </button>
+          <span className="text-lg font-medium">
+            Week {currentWeek + 1} of {weeklyCalories.length}
+          </span>
+          <button
+            onClick={handleNextWeek}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+          >
+            Next Week
+          </button>
+        </div>
+
+        {/* Calorie Chart */}
+        <div className="mb-6">
+          <canvas id="calories"></canvas>
+        </div>
+
+        {/* Selected Day Details */}
+        <div className="p-4 border rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-2">
+            Details for {selectedDay}
+          </h2>
+          <p>
+            Total Calories:{" "}
+            <span className="font-bold">
+              {calorieData.find((item) => item.day === selectedDay)
+                ?.totalCalories || 0}
+            </span>
+          </p>
+        </div>
+      </div>
+    </DefaultLayout>
+  );
 }
