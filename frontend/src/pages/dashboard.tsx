@@ -1,14 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Chart } from "chart.js/auto";
 import { Card, CardHeader, CardBody } from "@nextui-org/card";
 import DefaultLayout from "@/layouts/default";
 
-export default function DashboardPage() {
-  const [selectedDay, setSelectedDay] = useState("Sun."); // Default selected day
-  const [currentWeek, setCurrentWeek] = useState(0); // Default week index
+type CalorieData = {
+  day: string;
+  totalCalories: number;
+};
 
-  // Weekly calorie data
-  const weeklyCalories = [
+type MealData = {
+  meal: string;
+  calories: number;
+};
+
+export default function DashboardPage() {
+  const [selectedDay, setSelectedDay] = useState<string>("Sun."); // Default selected day
+  const [currentWeek, setCurrentWeek] = useState<number>(0); // Default week index
+
+  const weeklyCalories: CalorieData[][] = [
     [
       { day: "Sun.", totalCalories: 1500 },
       { day: "Mon.", totalCalories: 2200 },
@@ -30,15 +39,16 @@ export default function DashboardPage() {
   ];
 
   const calorieData = weeklyCalories[currentWeek]; // Get data for the current week
+  const maxCalories = Math.max(...calorieData.map((row) => row.totalCalories));
   const BMR = 2000; // Basal Metabolic Rate (BMR)
 
-  const meals = [
+  const meals: MealData[] = [
     { meal: "Breakfast", calories: 350 },
     { meal: "Lunch", calories: 850 },
     { meal: "Dinner", calories: 750 },
   ];
 
-  useEffect(() => {
+  const updateChart = useCallback(() => {
     if (Chart.getChart("calories")) {
       Chart.getChart("calories")?.destroy();
     }
@@ -80,8 +90,7 @@ export default function DashboardPage() {
           scales: {
             y: {
               beginAtZero: true,
-              max:
-                Math.max(...calorieData.map((row) => row.totalCalories)) + 200,
+              max: maxCalories + 200,
             },
           },
           onClick: (event, elements) => {
@@ -93,7 +102,19 @@ export default function DashboardPage() {
         },
       });
     }
-  }, [currentWeek]);
+  }, [calorieData, maxCalories, BMR]);
+
+  useEffect(() => {
+    updateChart();
+  }, [currentWeek, updateChart]);
+
+  const handleWeekChange = (direction: "prev" | "next") => {
+    setCurrentWeek((prev) =>
+      direction === "prev"
+        ? Math.max(prev - 1, 0)
+        : Math.min(prev + 1, weeklyCalories.length - 1)
+    );
+  };
 
   return (
     <DefaultLayout>
@@ -103,7 +124,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             {/* Previous Week */}
             <button
-              onClick={() => setCurrentWeek((prev) => Math.max(prev - 1, 0))}
+              onClick={() => handleWeekChange("prev")}
               className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition"
               aria-label="Previous Week"
             >
@@ -129,11 +150,7 @@ export default function DashboardPage() {
 
             {/* Next Week */}
             <button
-              onClick={() =>
-                setCurrentWeek((prev) =>
-                  Math.min(prev + 1, weeklyCalories.length - 1)
-                )
-              }
+              onClick={() => handleWeekChange("next")}
               className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition"
               aria-label="Next Week"
             >

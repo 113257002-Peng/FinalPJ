@@ -1,14 +1,20 @@
 import { useState, useEffect } from "react";
 import DefaultLayout from "@/layouts/default";
 
+type FoodEntry = {
+  name: string;
+  weight: string;
+  calories: string;
+};
+
 export default function FoodRecordPage() {
-  const [meal, setMeal] = useState("Dinner");
-  const [time, setTime] = useState("");
-  const [date, setDate] = useState("");
-  const [foodEntries, setFoodEntries] = useState([
+  const [meal, setMeal] = useState<string>("Dinner");
+  const [time, setTime] = useState<string>("");
+  const [date, setDate] = useState<string>("");
+  const [foodEntries, setFoodEntries] = useState<FoodEntry[]>([
     { name: "", weight: "", calories: "" },
   ]);
-  const [recommendation, setRecommendation] = useState("");
+  const [recommendation, setRecommendation] = useState<string>("");
 
   // 自動設定時間和日期
   useEffect(() => {
@@ -31,40 +37,49 @@ export default function FoodRecordPage() {
   }, []);
 
   const handleAddEntry = () => {
-    setFoodEntries([...foodEntries, { name: "", weight: "", calories: "" }]);
+    setFoodEntries((prev) => [...prev, { name: "", weight: "", calories: "" }]);
   };
 
   const handleInputChange = (
     index: number,
-    field: "name" | "weight" | "calories",
+    field: keyof FoodEntry,
     value: string
   ) => {
-    const newEntries = [...foodEntries];
-    newEntries[index][field] = value;
-    setFoodEntries(newEntries);
+    setFoodEntries((prev) =>
+      prev.map((entry, i) =>
+        i === index ? { ...entry, [field]: value } : entry
+      )
+    );
   };
 
-  const handleDeleteEntry = (index) => {
-    const newEntries = foodEntries.filter((_, i) => i !== index);
-    setFoodEntries(newEntries);
+  const handleDeleteEntry = (index: number) => {
+    setFoodEntries((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleGenerateRecommendation = async () => {
-    // Example API call
-    const response = await fetch("/api/generate-recommendation", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ meal, foodEntries }),
-    });
+    try {
+      const response = await fetch("/api/generate-recommendation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ meal, foodEntries }),
+      });
 
-    const data = await response.json();
-    setRecommendation(data.recommendation || "無法產生建議");
+      if (!response.ok) {
+        throw new Error("Failed to fetch recommendation");
+      }
+
+      const data = await response.json();
+      setRecommendation(data.recommendation || "無法產生建議");
+    } catch (error) {
+      console.error("Error generating recommendation:", error);
+      setRecommendation("發生錯誤，無法生成建議");
+    }
   };
 
   const handleSubmitResults = () => {
-    // Handle submitting results (e.g., send to server)
+    // 處理提交邏輯（可擴展）
     alert("紀錄成功！");
   };
 
