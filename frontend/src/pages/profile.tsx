@@ -1,8 +1,19 @@
 import { useState, useRef } from "react";
 import DefaultLayout from "@/layouts/default";
 
+// 定義 UserInfo 的型別，讓 avatar 支援 string | null
+type UserInfo = {
+  name: string;
+  email: string;
+  age: number;
+  height: number;
+  weight: number;
+  exerciseFrequency: number;
+  avatar: string | null;
+};
+
 export default function ProfilePage() {
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo, setUserInfo] = useState<UserInfo>({
     name: "User",
     email: "XXXXXXX@nccu.edu.tw",
     age: 24,
@@ -13,24 +24,26 @@ export default function ProfilePage() {
   });
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editInfo, setEditInfo] = useState(userInfo);
+  const [editInfo, setEditInfo] = useState<UserInfo>({ ...userInfo });
 
-  // 用於控制隱藏的檔案上傳 input
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 計算 BMR
   const calculateBMR = () => {
     return Math.round(
       10 * userInfo.weight + 6.25 * userInfo.height - 5 * userInfo.age + 5
     );
   };
 
-  const handleInputChange = (field: string, value: string | number) => {
-    setEditInfo({
-      ...editInfo,
+  // 處理輸入變更
+  const handleInputChange = (field: keyof UserInfo, value: string | number) => {
+    setEditInfo((prev) => ({
+      ...prev,
       [field]: value,
-    });
+    }));
   };
 
+  // 處理頭像變更
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -45,19 +58,20 @@ export default function ProfilePage() {
     }
   };
 
+  // 保存變更
   const handleSave = () => {
-    setUserInfo(editInfo); // 保存編輯後的資料
+    setUserInfo({ ...editInfo });
     setIsEditing(false); // 結束編輯模式
   };
 
+  // 取消編輯
   const handleCancel = () => {
-    setEditInfo(userInfo); // 恢復未編輯的資料
+    setEditInfo({ ...userInfo }); // 恢復原本的資料
     setIsEditing(false); // 結束編輯模式
   };
 
   const handleAvatarClick = () => {
-    // 點擊頭像時模擬點擊檔案上傳的按鈕
-    fileInputRef.current?.click();
+    fileInputRef.current?.click(); // 模擬點擊檔案上傳按鈕
   };
 
   return (
