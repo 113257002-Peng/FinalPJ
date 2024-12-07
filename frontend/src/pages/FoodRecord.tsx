@@ -34,7 +34,11 @@ export default function FoodRecordPage() {
     setFoodEntries([...foodEntries, { name: "", weight: "", calories: "" }]);
   };
 
-  const handleInputChange = (index, field, value) => {
+  const handleInputChange = (
+    index: number,
+    field: "name" | "weight" | "calories",
+    value: string
+  ) => {
     const newEntries = [...foodEntries];
     newEntries[index][field] = value;
     setFoodEntries(newEntries);
