@@ -45,8 +45,8 @@ export default function DashboardPage() {
     { weekDay: "Sun", count: 1693 },
   ];
 
-  const calorieData = weeklyCalories[currentWeek];
-  const BMR = 2000;
+  // const calorieData = weeklyCalories[currentWeek];
+  // const BMR = 2000;
 
   const meals = [
     { meal: "Breakfast", calories: 350 },
