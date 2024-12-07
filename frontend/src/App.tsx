@@ -9,7 +9,7 @@ import InfoFormPage from "@/pages/info-form";
 import ProfilePage from "@/pages/profile";
 import ChatboxPage from "@/pages/chatbox";
 import FoodRecordPage from "@/pages/FoodRecord";
-import FoodContentPage from "@/pages/foodcontent";
+import FoodContentPage from "@/pages/FoodContent";
 
 function App() {
   return (
