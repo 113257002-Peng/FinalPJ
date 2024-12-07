@@ -8,7 +8,7 @@ type FoodEntry = {
 };
 
 export default function MealDetailPage() {
-  const [mealDetails, setMealDetails] = useState({
+  const [mealDetails] = useState({
     meal: "Lunch",
     timestamp: "Oct 11 at 10:20 pm",
     estimatedCalories: "890",
