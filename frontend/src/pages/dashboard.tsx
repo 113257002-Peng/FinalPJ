@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Chart } from "chart.js/auto";
-import { Card, CardHeader, CardBody } from "@nextui-org/card";
+// import { Card, CardHeader, CardBody } from "@nextui-org/card";
 import DefaultLayout from "@/layouts/default";
 
 type CalorieData = {
@@ -93,7 +93,7 @@ export default function DashboardPage() {
               max: maxCalories + 200,
             },
           },
-          onClick: (event, elements) => {
+          onClick: (elements) => {
             if (elements.length > 0) {
               const index = elements[0].index;
               setSelectedDay(calorieData[index].day);
