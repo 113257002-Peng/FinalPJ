@@ -28,6 +28,18 @@ export const siteConfig = {
       label: "Profile",
       href: "/profile",
     },
+    {
+      label: "chatbox",
+      href: "/chatbox",
+    },
+    {
+      label: "FoodRecord",
+      href: "/FoodRecord",
+    },
+    {
+      label: "FoodContent",
+      href: "/FoodContent",
+    },
   ],
   navMenuItems: [
     {
@@ -53,6 +65,18 @@ export const siteConfig = {
     {
       label: "Profile",
       href: "/profile",
+    },
+    {
+      label: "chatbox",
+      href: "/chatbox",
+    },
+    {
+      label: "FoodRecord",
+      href: "/FoodRecord",
+    },
+    {
+      label: "FoodContent",
+      href: "/FoodContent",
     },
   ],
   links: {
